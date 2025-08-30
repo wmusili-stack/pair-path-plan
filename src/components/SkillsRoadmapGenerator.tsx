@@ -3,55 +3,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { Loader2, Target, Lightbulb } from 'lucide-react';
-
-// Mock roadmap data
-const mockRoadmaps = {
-  'web development': {
-    title: 'Web Development Roadmap',
-    description: 'Complete path to becoming a full-stack web developer',
-    steps: [
-      { title: 'HTML & CSS Fundamentals', duration: '2-3 weeks', resources: ['MDN Web Docs', 'freeCodeCamp'] },
-      { title: 'JavaScript Basics', duration: '4-6 weeks', resources: ['JavaScript.info', 'Eloquent JavaScript'] },
-      { title: 'React Framework', duration: '6-8 weeks', resources: ['React Docs', 'React Tutorial'] },
-      { title: 'Backend with Node.js', duration: '8-10 weeks', resources: ['Node.js Docs', 'Express.js Guide'] },
-      { title: 'Database Integration', duration: '3-4 weeks', resources: ['MongoDB University', 'PostgreSQL Tutorial'] }
-    ]
-  },
-  'data science': {
-    title: 'Data Science Roadmap',
-    description: 'Journey to becoming a data scientist',
-    steps: [
-      { title: 'Python Programming', duration: '4-6 weeks', resources: ['Python.org Tutorial', 'Automate the Boring Stuff'] },
-      { title: 'Statistics & Math', duration: '6-8 weeks', resources: ['Khan Academy', 'StatQuest YouTube'] },
-      { title: 'Data Analysis with Pandas', duration: '4-5 weeks', resources: ['Pandas Documentation', '10 Minutes to Pandas'] },
-      { title: 'Machine Learning', duration: '10-12 weeks', resources: ['Scikit-learn', 'Coursera ML Course'] },
-      { title: 'Deep Learning', duration: '8-10 weeks', resources: ['TensorFlow', 'Fast.ai'] }
-    ]
-  }
-};
-
-// Generate roadmap based on interests
-const generateFromInterests = (interest1: string, interest2: string) => {
-  const combinations = {
-    'art,technology': 'web development',
-    'technology,art': 'web development',
-    'data,technology': 'data science',
-    'technology,data': 'data science',
-    'business,technology': 'web development',
-    'technology,business': 'web development'
-  };
-  
-  const key = `${interest1.toLowerCase()},${interest2.toLowerCase()}`;
-  return combinations[key as keyof typeof combinations] || 'web development';
-};
+import { Loader2, Target, Lightbulb, Clock, BarChart3 } from 'lucide-react';
+import { mockRoadmaps, findBestMatchingSkill, getRoadmapBySkill, type Roadmap } from '@/data/roadmaps';
 
 export default function SkillsRoadmapGenerator() {
   const [inputMode, setInputMode] = useState<'skill' | 'interests'>('skill');
   const [skill, setSkill] = useState('');
   const [interest1, setInterest1] = useState('');
   const [interest2, setInterest2] = useState('');
-  const [roadmap, setRoadmap] = useState<any>(null);
+  const [roadmap, setRoadmap] = useState<Roadmap | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const generateRoadmap = async () => {
@@ -60,17 +20,18 @@ export default function SkillsRoadmapGenerator() {
 
     setIsLoading(true);
     
-    // Simulate API call
+    // Simulate API call delay
     await new Promise(resolve => setTimeout(resolve, 1500));
     
-    let targetSkill = '';
+    let generatedRoadmap: Roadmap | null = null;
+    
     if (inputMode === 'skill') {
-      targetSkill = skill.toLowerCase();
+      generatedRoadmap = getRoadmapBySkill(skill);
     } else {
-      targetSkill = generateFromInterests(interest1, interest2);
+      const targetSkill = findBestMatchingSkill(interest1, interest2);
+      generatedRoadmap = mockRoadmaps[targetSkill] || mockRoadmaps['web-development'];
     }
     
-    const generatedRoadmap = mockRoadmaps[targetSkill as keyof typeof mockRoadmaps] || mockRoadmaps['web development'];
     setRoadmap(generatedRoadmap);
     setIsLoading(false);
   };
@@ -172,32 +133,102 @@ export default function SkillsRoadmapGenerator() {
           </Button>
         </Card>
 
-        {/* Output Section */}
+        {/* Enhanced Output Section */}
         {roadmap && (
           <Card className="p-8 shadow-elegant border-0 bg-card/50 backdrop-blur animate-in slide-in-from-bottom duration-500">
-            <div className="mb-6">
-              <h2 className="text-3xl font-bold text-foreground mb-2">{roadmap.title}</h2>
-              <p className="text-muted-foreground text-lg">{roadmap.description}</p>
+            {/* Roadmap Header */}
+            <div className="mb-8">
+              <div className="flex items-start justify-between mb-4">
+                <div>
+                  <h2 className="text-3xl font-bold text-foreground mb-2">{roadmap.title}</h2>
+                  <p className="text-muted-foreground text-lg">{roadmap.description}</p>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
+                    <Clock className="h-4 w-4" />
+                    {roadmap.estimatedTime}
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <BarChart3 className="h-4 w-4" />
+                    {roadmap.difficulty}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                {roadmap.tags.map((tag: string, index: number) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
             
-            <div className="space-y-4">
-              {roadmap.steps.map((step: any, index: number) => (
-                <div key={index} className="flex gap-4 p-4 rounded-lg bg-muted/30 border border-border/50">
-                  <div className="flex-shrink-0 w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">
-                    {index + 1}
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-lg mb-1">{step.title}</h3>
-                    <p className="text-muted-foreground mb-2">Duration: {step.duration}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {step.resources.map((resource: string, resourceIndex: number) => (
-                        <span
-                          key={resourceIndex}
-                          className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium"
-                        >
-                          {resource}
-                        </span>
-                      ))}
+            {/* Roadmap Steps */}
+            <div className="space-y-6">
+              {roadmap.steps.map((step, index) => (
+                <div key={index} className="relative">
+                  {/* Connection Line */}
+                  {index < roadmap.steps.length - 1 && (
+                    <div className="absolute left-4 top-12 w-0.5 h-16 bg-gradient-to-b from-primary to-primary/30"></div>
+                  )}
+                  
+                  <div className="flex gap-6">
+                    {/* Step Number */}
+                    <div className="flex-shrink-0 w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold shadow-glow">
+                      {index + 1}
+                    </div>
+                    
+                    {/* Step Content */}
+                    <div className="flex-1 pb-6">
+                      <div className="bg-muted/30 border border-border/50 rounded-lg p-6">
+                        <h3 className="font-bold text-xl mb-2">{step.title}</h3>
+                        <div className="flex items-center gap-4 mb-3 text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            {step.duration}
+                          </span>
+                        </div>
+                        {step.description && (
+                          <p className="text-muted-foreground mb-4">{step.description}</p>
+                        )}
+                        
+                        {/* Prerequisites */}
+                        {step.prerequisites && step.prerequisites.length > 0 && (
+                          <div className="mb-4">
+                            <h4 className="font-medium text-sm mb-2 text-muted-foreground">Prerequisites:</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {step.prerequisites.map((prereq: string, prereqIndex: number) => (
+                                <span
+                                  key={prereqIndex}
+                                  className="px-2 py-1 bg-secondary/50 text-secondary-foreground rounded text-xs"
+                                >
+                                  {prereq}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Resources */}
+                        <div>
+                          <h4 className="font-medium text-sm mb-3 text-foreground">Recommended Resources:</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {step.resources.map((resource: string, resourceIndex: number) => (
+                              <span
+                                key={resourceIndex}
+                                className="px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-medium hover:bg-primary/20 transition-smooth cursor-pointer"
+                              >
+                                {resource}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
