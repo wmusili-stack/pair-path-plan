@@ -32,12 +32,12 @@
 - [ ] 4.6 Connect components with state management
 
 ## Phase 5: Styling & User Experience
-- [ ] 5.1 Apply responsive layout with proper centering
-- [ ] 5.2 Style input sections with clean, accessible forms
-- [ ] 5.3 Add hover and focus states for interactive elements
-- [ ] 5.4 Style the output area with proper content formatting
-- [ ] 5.5 Add smooth transitions and micro-animations
-- [ ] 5.6 Ensure proper spacing and visual hierarchy
+- [x] 5.1 Apply responsive layout with proper centering
+- [x] 5.2 Style input sections with clean, accessible forms
+- [x] 5.3 Add hover and focus states for interactive elements
+- [x] 5.4 Style the output area with proper content formatting
+- [x] 5.5 Add smooth transitions and micro-animations
+- [x] 5.6 Ensure proper spacing and visual hierarchy
 
 ## Phase 6: Integration & Testing
 - [ ] 6.1 Integrate all components in main Index page
