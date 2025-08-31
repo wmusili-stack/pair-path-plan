@@ -40,12 +40,12 @@
 - [x] 5.6 Ensure proper spacing and visual hierarchy
 
 ## Phase 6: Integration & Testing
-- [ ] 6.1 Integrate all components in main Index page
-- [ ] 6.2 Test input validation edge cases
-- [ ] 6.3 Test responsive behavior on different screen sizes
-- [ ] 6.4 Test keyboard navigation and accessibility
-- [ ] 6.5 Verify mock data displays correctly in all scenarios
-- [ ] 6.6 Test user flow from input to roadmap generation
+- [x] 6.1 Integrate all components in main Index page
+- [x] 6.2 Test input validation edge cases
+- [x] 6.3 Test responsive behavior on different screen sizes
+- [x] 6.4 Test keyboard navigation and accessibility
+- [x] 6.5 Verify mock data displays correctly in all scenarios
+- [x] 6.6 Test user flow from input to roadmap generation
 
 ## Phase 7: Polish & Documentation
 - [ ] 7.1 Add loading indicators and empty states

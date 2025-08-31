@@ -15,25 +15,40 @@ export default function SkillsRoadmapGenerator() {
   const [isLoading, setIsLoading] = useState(false);
 
   const generateRoadmap = async () => {
-    if (inputMode === 'skill' && !skill.trim()) return;
-    if (inputMode === 'interests' && (!interest1.trim() || !interest2.trim())) return;
+    // Input validation
+    if (inputMode === 'skill' && !skill.trim()) {
+      console.warn('Skill input is empty');
+      return;
+    }
+    if (inputMode === 'interests' && (!interest1.trim() || !interest2.trim())) {
+      console.warn('One or both interest inputs are empty');
+      return;
+    }
 
     setIsLoading(true);
     
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    let generatedRoadmap: Roadmap | null = null;
-    
-    if (inputMode === 'skill') {
-      generatedRoadmap = getRoadmapBySkill(skill);
-    } else {
-      const targetSkill = findBestMatchingSkill(interest1, interest2);
-      generatedRoadmap = mockRoadmaps[targetSkill] || mockRoadmaps['web-development'];
+    try {
+      // Simulate API call delay for realistic UX
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      let generatedRoadmap: Roadmap | null = null;
+      
+      if (inputMode === 'skill') {
+        generatedRoadmap = getRoadmapBySkill(skill);
+        console.log(`Generated roadmap for skill: ${skill}`, generatedRoadmap);
+      } else {
+        const targetSkill = findBestMatchingSkill(interest1, interest2);
+        generatedRoadmap = mockRoadmaps[targetSkill] || mockRoadmaps['web-development'];
+        console.log(`Matched interests "${interest1}" + "${interest2}" to skill: ${targetSkill}`, generatedRoadmap);
+      }
+      
+      setRoadmap(generatedRoadmap);
+    } catch (error) {
+      console.error('Error generating roadmap:', error);
+      // Could add error state handling here in the future
+    } finally {
+      setIsLoading(false);
     }
-    
-    setRoadmap(generatedRoadmap);
-    setIsLoading(false);
   };
 
   return (
@@ -89,28 +104,44 @@ export default function SkillsRoadmapGenerator() {
                   placeholder="e.g., Web Development, Data Science, Digital Marketing"
                   value={skill}
                   onChange={(e) => setSkill(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !isLoading && skill.trim() && generateRoadmap()}
                   className="h-12 text-base border-2 transition-all duration-300 focus:ring-2 focus:ring-primary/20 hover:border-primary/50 focus:shadow-glow"
+                  aria-describedby="skill-help"
                 />
+                <p id="skill-help" className="text-sm text-muted-foreground">
+                  Press Enter to generate or click the button below
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
                 <Label className="text-base font-medium text-foreground">What are you interested in?</Label>
                 <div className="grid md:grid-cols-2 gap-4">
-                  <Input
-                    id="interest1"
-                    placeholder="First interest (e.g., art, technology)"
-                    value={interest1}
-                    onChange={(e) => setInterest1(e.target.value)}
-                    className="h-12 text-base border-2 transition-all duration-300 focus:ring-2 focus:ring-primary/20 hover:border-primary/50 focus:shadow-glow"
-                  />
-                  <Input
-                    id="interest2"
-                    placeholder="Second interest (e.g., design, business)"
-                    value={interest2}
-                    onChange={(e) => setInterest2(e.target.value)}
-                    className="h-12 text-base border-2 transition-all duration-300 focus:ring-2 focus:ring-primary/20 hover:border-primary/50 focus:shadow-glow"
-                  />
+                  <div className="space-y-1">
+                    <Input
+                      id="interest1"
+                      placeholder="First interest (e.g., art, technology)"
+                      value={interest1}
+                      onChange={(e) => setInterest1(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && !isLoading && interest1.trim() && interest2.trim() && generateRoadmap()}
+                      className="h-12 text-base border-2 transition-all duration-300 focus:ring-2 focus:ring-primary/20 hover:border-primary/50 focus:shadow-glow"
+                      aria-describedby="interests-help"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Input
+                      id="interest2"
+                      placeholder="Second interest (e.g., design, business)"
+                      value={interest2}
+                      onChange={(e) => setInterest2(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && !isLoading && interest1.trim() && interest2.trim() && generateRoadmap()}
+                      className="h-12 text-base border-2 transition-all duration-300 focus:ring-2 focus:ring-primary/20 hover:border-primary/50 focus:shadow-glow"
+                      aria-describedby="interests-help"
+                    />
+                  </div>
                 </div>
+                <p id="interests-help" className="text-sm text-muted-foreground">
+                  Enter two interests to find your perfect learning path
+                </p>
               </div>
             )}
           </div>
